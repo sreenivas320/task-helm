@@ -1,39 +1,43 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "nginx-chart.fullname" . }}
-  labels:
-    {{- include "nginx-chart.labels" . | nindent 4 }}
+  name: myreleasenginx
+  Ilabels:
+   app: nginx
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      {{- include "nginx-chart.selectorLabels" . | nindent 6 }}
+      app: nginx
   template:
     metadata:
       labels:
-        {{- include "nginx-chart.selectorLabels" . | nindent 8 }}
+        app: nginx
     spec:
-      affinity:
-        {{- toYaml .Values.affinity | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+        - name: nginx
+          image: nginx:latest
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            
+          resources:
+           requests:
+            cpu: 100m
+            memory: 128Mi
+           limits:
+            cpu: 100m
+            memory: 128Mi
           volumeMounts:
-            - name: {{ .Values.volume.name }}
-              mountPath: {{ .Values.volume.mountPath }}
+           - name: nginx-volume
+             mountPath: "/usr/share/nginx/html"
       volumes:
-        - name: {{ .Values.volume.name }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.volume.name }}-pvc
+       - name: nginx-volume
+         persistentVolumeClaim:
+          claimName: nginx-vpc  
+      nodeSelector:
+       role: worker
