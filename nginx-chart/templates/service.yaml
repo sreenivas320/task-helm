@@ -1,0 +1,16 @@
+# templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "nginx-chart.fullname" . }}
+  labels:
+    {{- include "nginx-chart.labels" . | nindent 4 }}
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "nginx-chart.selectorLabels" . | nindent 4 }}

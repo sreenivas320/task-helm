@@ -1,0 +1,52 @@
+replicaCount: 1
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: "latest"
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "200m"
+    memory: "256Mi"
+ingress:
+  enabled: true
+  defaultBackend:
+    service:
+      name: myreleasenginx-chart 
+      port: 
+      number: 80 
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2  
+      #livenessProbe:
+      #  httpGet:
+      #path: /
+      #port: http
+      #initialDelaySeconds: 10
+      #periodSeconds: 10
+      #readinessProbe:
+      # httpGet:
+      # path: /
+      #port: http
+      # initialDelaySeconds: 5
+      # periodSeconds: 10
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - nginx
+        topologyKey: "kubernetes.io/hostname"
+volume:
+  name: nginx-volume
+  mountPath: "/usr/share/nginx/html"
+  size: "2Gi"
+  storageClass: "standard"  # Set this to the appropriate storage class in your cluster
+serviceAccount:
+ create: true  
