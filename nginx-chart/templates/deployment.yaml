@@ -14,29 +14,23 @@ spec:
       labels:
         {{- include "nginx-chart.selectorLabels" . | nindent 8 }}
     spec:
+      affinity: {{ toYaml .Values.affinity | indent 10 }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
-            limits:
-              cpu: {{ .Values.resources.limits.cpu }}
-              memory: {{ .Values.resources.limits.memory }}
-            requests:
-              cpu: {{ .Values.resources.requests.cpu }}
-              memory: {{ .Values.resources.requests.memory }}
-          ports:
-            - containerPort: 80
-          livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
-          readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
-      affinity:
-        {{- toYaml .Values.affinity | nindent 8 }}
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe: {{ toYaml .Values.livenessProbe | indent 12 }}
+          readinessProbe: {{ toYaml .Values.readinessProbe | indent 12 }}
+          volumeMounts:
+            - mountPath: "/usr/share/nginx/html"
+              name: storage
       volumes:
-        - name: nginx-storage
+        - name: storage
           persistentVolumeClaim:
-            claimName: nginx-pvc
+            claimName: {{ include "nginx-chart.fullname" . }}-pvc
+
 
 
 
