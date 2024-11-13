@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "nginx-chart.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "nginx-chart.name" . }}
+    helm.sh/chart: {{ include "nginx-chart.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+spec:
+  rules:
+    - host: {{ .Values.ingress.host | default "nginx.local" }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "nginx-chart.fullname" . }}
+                port:
+                  number: 8080
+  defaultBackend:
+    service:
+      name: {{ include "nginx-chart.fullname" . }}
+      port:
+        number: 8080
+

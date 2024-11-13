@@ -1,0 +1,52 @@
+---
+replicaCount: 1
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: stable
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+ports:
+  - containerPort: 8080
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/e2e-az-name
+              operator: In
+              values:
+                - ap-southeast-2a
+persistence: enabled
+serviceAccount:
+  create: true
+service:
+ port: 8080 
+ingress:
+ enabled: true 
+ host: nginx.local  
+# Other existing values ...
+
+# Autoscaling configuration (HorizontalPodAutoscaler)
+autoscaling:
+  enabled: true  # Set to false to disable autoscaling
+  minReplicas: 1
+  maxReplicas: 1
+  targetCPUUtilizationPercentage: 80   
