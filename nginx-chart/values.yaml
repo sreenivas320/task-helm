@@ -38,7 +38,8 @@ persistence: enabled
 serviceAccount:
   create: true
 service:
- port: 8080 
+ port: 8080
+ type: ClusterIP  
 ingress:
  enabled: true 
  host: nginx.local  
